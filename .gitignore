@@ -1,0 +1,38 @@
+# --- Raw data (source files are never committed) ---
+data/raw/*
+!data/raw/.gitkeep
+
+# --- Processed data ---
+data/processed/*
+!data/processed/.gitkeep
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# --- Jupyter notebook checkpoints ---
+.ipynb_checkpoints/
+
+# --- SQLite databases ---
+*.db
+*.sqlite
+*.sqlite3
+
+# --- Common temporary / editor / OS files ---
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+.~lock.*
