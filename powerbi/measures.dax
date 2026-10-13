@@ -1,0 +1,148 @@
+// ============================================================================
+// measures.dax
+// Superstore Sales & Profitability Analysis - Power BI measure library
+// ----------------------------------------------------------------------------
+// Scope:  core KPIs, year-over-year sales, order-grain order-to-ship days,
+//         and return measures.
+//
+// Model assumptions (see powerbi/model_specification.md):
+//   - Orders is the fact, at ORDER-LINE grain (Row ID is the line key).
+//   - Orders[Order ID] repeats; every order count uses DISTINCTCOUNT.
+//   - Relationships to Orders are all single-direction (one -> many):
+//       Date[Date]          -> Orders[Order Date]   (active)
+//       Date[Date]          -> Orders[Ship Date]    (inactive; USERELATIONSHIP)
+//       Customers[Customer ID] -> Orders[Customer ID]
+//       Products[Product ID]   -> Orders[Product ID]
+//       Geography[GeographyKey]-> Orders[GeographyKey]
+//       Returns[Order ID]      -> Orders[Order ID]
+//   - The Returns -> Orders relationship is SINGLE-direction. Return measures
+//     are therefore defined over Orders and inherit the model's filter context.
+//
+// Core KPI definitions match sql/03-sql/10 so results reconcile:
+//   sales = SUM(Sales), profit = SUM(Profit),
+//   profit_margin = SUM(Profit) / SUM(Sales),
+//   orders = COUNT(DISTINCT Order ID), units = SUM(Quantity),
+//   avg_order_value = SUM(Sales) / COUNT(DISTINCT Order ID).
+//
+// Note: this file contains MEASURES only. Calculated tables/columns (Date,
+// Customers, Products, Geography, Orders[GeographyKey]) are defined in
+// powerbi/model_specification.md.
+// ============================================================================
+
+
+// ----------------------------------------------------------------------------
+// Core KPIs
+// ----------------------------------------------------------------------------
+
+Total Sales = SUM ( Orders[Sales] )
+// Format: $#,##0.00  |  Overall: 2,326,534.35
+
+Total Profit = SUM ( Orders[Profit] )
+// Format: $#,##0.00  |  Overall: 292,296.81
+
+Profit Margin = DIVIDE ( [Total Profit], [Total Sales] )
+// Format: 0.00%  |  Overall: 12.56%
+
+Total Orders = DISTINCTCOUNT ( Orders[Order ID] )
+// Format: #,##0  |  Overall: 5,111
+
+Units Sold = SUM ( Orders[Quantity] )
+// Format: #,##0  |  Overall: 38,654
+
+Avg Order Value = DIVIDE ( [Total Sales], [Total Orders] )
+// Format: $#,##0.00  |  Overall: 455.20
+
+
+// ----------------------------------------------------------------------------
+// Time intelligence / year-over-year sales
+// (uses the ACTIVE Date[Date] -> Orders[Order Date] relationship)
+// ----------------------------------------------------------------------------
+
+Total Sales LY =
+CALCULATE (
+    [Total Sales],
+    SAMEPERIODLASTYEAR ( 'Date'[Date] )
+)
+// Same period, prior year.
+
+Sales YoY Change = [Total Sales] - [Total Sales LY]
+// Format: $#,##0.00
+
+Sales YoY % = DIVIDE ( [Sales YoY Change], [Total Sales LY] )
+// Format: 0.00%
+
+Total Sales YTD =
+TOTALYTD ( [Total Sales], 'Date'[Date] )
+// Cumulative year-to-date; NOTE: 2026 is incomplete/future-dated (see caveats).
+
+
+// ----------------------------------------------------------------------------
+// Shipping - average order-to-ship days at ORDER grain
+// ----------------------------------------------------------------------------
+
+Avg Order-to-Ship Days =
+AVERAGEX (
+    VALUES ( Orders[Order ID] ),
+    VAR OrderDate = CALCULATE ( MIN ( Orders[Order Date] ) )
+    VAR ShipDate  = CALCULATE ( MIN ( Orders[Ship Date] ) )
+    RETURN
+        DATEDIFF ( OrderDate, ShipDate, DAY )
+)
+// One value per Order ID (repeated line dates collapse via MIN), matching the
+// order-grain convention in sql/09. Format: 0.00
+
+Avg Order-to-Ship Days (Ship Date) =
+CALCULATE (
+    [Avg Order-to-Ship Days],
+    USERELATIONSHIP ( Orders[Ship Date], 'Date'[Date] )
+)
+// Same measure but a Date slicer filters via Ship Date instead of Order Date.
+
+Sales by Ship Date =
+CALCULATE (
+    [Total Sales],
+    USERELATIONSHIP ( Orders[Ship Date], 'Date'[Date] )
+)
+// Example of ship-date-based analysis; pairs with the inactive relationship.
+
+
+// ----------------------------------------------------------------------------
+// Returns
+// ----------------------------------------------------------------------------
+// Counted over Orders (NOT over the Returns table) so the figures respond to
+// date / region / category / customer filters through the single-direction
+// Returns -> Orders relationship. Returns are order-level flags, not refunds.
+
+Returned Orders =
+CALCULATE (
+    DISTINCTCOUNT ( Orders[Order ID] ),
+    Returns[Returned] = "Yes"
+)
+// Format: #,##0  |  Overall: 296
+
+Return Rate = DIVIDE ( [Returned Orders], [Total Orders] )
+// Format: 0.00%  |  Overall: 5.79%
+
+Returned Order Sales =
+CALCULATE ( [Total Sales], Returns[Returned] = "Yes" )
+// Format: $#,##0.00  |  Overall: 180,504.28 (sales on returned-order lines)
+
+Returned Order Profit =
+CALCULATE ( [Total Profit], Returns[Returned] = "Yes" )
+// Format: $#,##0.00  |  Overall: 23,232.36
+
+Returned Order Sales % = DIVIDE ( [Returned Order Sales], [Total Sales] )
+// Format: 0.00%  |  Overall: 7.76%
+
+
+// ----------------------------------------------------------------------------
+// Optional profitability helper (matches sql/05 definition)
+// ----------------------------------------------------------------------------
+
+Sales-Weighted Discount Index =
+DIVIDE (
+    SUMX ( Orders, Orders[Sales] * Orders[Discount] ),
+    [Total Sales]
+)
+// Weighted average discount; format: 0.00%
+// Discount bands in sql/05 use half-open ranges (0.00), (0.00,0.10] ... (0.70,0.80].
