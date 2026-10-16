@@ -122,7 +122,21 @@ powerbi/          # Model specification and DAX measure library
 Run from the repository root. `data/` is Git-ignored, so place the raw workbook at
 `data/raw/sample_-_superstore.xls` first (link above).
 
-1. Generate the processed CSV files. This **rewrites the tracked notebook**
+1. Create the virtual environment and install the pinned dependencies from
+   [`requirements.txt`](requirements.txt) with Python 3:
+
+   ```bash
+   python3 -m venv .venv
+   .venv/bin/python -m pip install --upgrade pip
+   .venv/bin/python -m pip install -r requirements.txt
+   ```
+
+   The steps below invoke `.venv/bin/...` directly, so activating the environment is not
+   required. The SQLite command-line tool (`sqlite3`) is also needed for the validation and
+   query commands; it is a separate system tool, **not** a Python package, so it is not
+   installed by `requirements.txt`.
+
+2. Generate the processed CSV files. This **rewrites the tracked notebook**
    `notebooks/02_data_cleaning.ipynb` with fresh execution outputs, so check the result
    and commit it deliberately:
 
@@ -130,14 +144,14 @@ Run from the repository root. `data/` is Git-ignored, so place the raw workbook 
    .venv/bin/jupyter nbconvert --to notebook --execute --inplace notebooks/02_data_cleaning.ipynb
    ```
 
-2. Create or rebuild the database. The loader uses only the Python standard
+3. Create or rebuild the database. The loader uses only the Python standard
    library and is safe to re-run (tables are dropped and recreated first):
 
    ```bash
    .venv/bin/python scripts/load_superstore_db.py
    ```
 
-3. Inspect the validation results:
+4. Inspect the validation results:
 
    ```bash
    sqlite3 -header -column data/processed/superstore.db < sql/02_validate_database.sql
@@ -148,12 +162,12 @@ Run from the repository root. `data/` is Git-ignored, so place the raw workbook 
 | Entry point | Command |
 |---|---|
 | Data understanding (exploratory) | `.venv/bin/jupyter nbconvert --to notebook --execute --output-dir=/tmp notebooks/01_data_understanding.ipynb` |
-| Data cleaning | Same command as **step 1** above |
+| Data cleaning | Same command as **step 2** above |
 | SQL analyses (`sql/03`–`sql/10`) | `sqlite3 -header -column data/processed/superstore.db < sql/03_sales_trends.sql` (same pattern for `sql/04`–`sql/10`) |
 | Power BI model | See [`powerbi/README.md`](powerbi/README.md) |
 
 Side effects: the data-understanding command writes its executed copy to `/tmp`, leaving
-the tracked notebook untouched. The cleaning command in **step 1** uses `--inplace` and
+the tracked notebook untouched. The cleaning command in **step 2** uses `--inplace` and
 deliberately rewrites `notebooks/02_data_cleaning.ipynb`, as noted there.
 
 Relevant files:
