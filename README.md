@@ -43,12 +43,17 @@ Detailed findings: [`reports/portfolio_insights.md`](reports/portfolio_insights.
 
 ## Dataset
 
-Tableau's official sample dataset:
+Tableau's official "Superstore" sample dataset, obtained from:
 
 - https://public.tableau.com/app/sample-data/sample_-_superstore.xls
 
 The workbook is stored at `data/raw/sample_-_superstore.xls` and is not tracked by
 Git. It contains three sheets: `Orders`, `People`, and `Returns`.
+
+**The dataset is not redistributed in this repository** — no copy of the workbook is
+committed. Only the analysis code and derived results are published; the source workbook
+must be obtained from the link above. This repository makes no claim about the dataset's
+license or terms; refer to the source for the applicable terms.
 
 **Grain and size.** One row per order line: **10,194 rows × 21 columns**, covering
 **5,111 distinct orders**, **804 customers**, and **1,862 products**. The SQLite database
