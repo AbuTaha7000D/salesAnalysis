@@ -1,6 +1,6 @@
 # Power BI Model & DAX Library
 
-Implementation of the Power BI data model and DAX measure library for the
+Reference specification and DAX measure library for the
 Superstore Sales & Profitability Analysis project. It reuses the verified results
 in `sql/01`–`sql/10` and `reports/executive_summary.md`; no new analysis findings
 are introduced.
@@ -14,7 +14,7 @@ are introduced.
 
 ## Source of truth
 
-The model is built from the cleaned data produced by the project notebooks:
+The reference model is built from the cleaned data produced by the project notebooks:
 
 - Raw workbook: `data/raw/sample_-_superstore.xls` (out of scope to modify).
 - Cleaning/decisions: `notebooks/02_data_cleaning.ipynb`.
@@ -100,6 +100,17 @@ claimed. The steps below reproduce the documented model on Windows.
   `DISTINCTCOUNT` measures and never sum distinct counts across groups.
 - Names are ambiguous for 32 product IDs (and 800 customer names vs 804 IDs);
   key and group by ID.
+
+## Report output
+
+The interactive report lives in **Power BI Service**. Exported assets committed to this
+repository:
+
+- [`docs/screenshots/powerbi-report-overview.jpg`](../docs/screenshots/powerbi-report-overview.jpg) — 2000 px screenshot of the single report page
+- [`docs/powerbi-report-superstore.pdf`](../docs/powerbi-report-superstore.pdf) — full-resolution PDF export (1 page)
+
+The report **visuals are not part of any file in this repository's model**; they exist in
+Power BI Service and in the two exports above.
 
 ## Scope and limitations
 

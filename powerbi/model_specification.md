@@ -8,9 +8,11 @@ SQL analyses in `sql/01`–`sql/10` and `reports/executive_summary.md`.
 The companion measure library is `measures.dax`; setup and refresh steps are in
 `README.md`.
 
-Everything below was verified against `data/processed/superstore.db`. This is a
-**specification**, not a built `.pbix`: Power BI Desktop is Windows-only and was
-not run here (see `README.md`).
+The underlying data and analytical results in this document were verified against
+`data/processed/superstore.db`. The Power BI star schema described here is a
+**reference / target design**, not a verified description of the deployed Power BI
+Service model: Power BI Desktop is Windows-only and was not run here (see `README.md`),
+so the Service report's actual tables and relationships have not been inspected.
 
 ---
 

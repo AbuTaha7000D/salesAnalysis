@@ -84,12 +84,21 @@ Requires Python 3 with pandas, xlrd, matplotlib, and Jupyter; the virtual enviro
 
 ## Power BI
 
-The interactive semantic model and report were built in **Power BI Service**. This
-repository contains the supporting artifacts —
-[`powerbi/model_specification.md`](powerbi/model_specification.md) (tables, grain, keys,
-relationships, date handling, data-quality caveats) and
+The interactive report was built in **Power BI Service**. This repository contains the
+**reference model specification** —
+[`powerbi/model_specification.md`](powerbi/model_specification.md) (the intended star
+schema: tables, grain, keys, relationships, date handling, data-quality caveats) — and
 [`powerbi/measures.dax`](powerbi/measures.dax) (KPI, YoY, shipping, returns, and discount
-measures) — **not a `.pbix` file**.
+measures), **not a `.pbix` file**. The Service report's actual tables and relationships
+have not been verified from this environment; treat the specification as the intended
+reference design.
+
+![Power BI report — sales performance, profitability and regional insights](docs/screenshots/powerbi-report-overview.jpg)
+
+*The single report page: KPI cards (total sales, orders, profit margin, total profit),
+monthly sales & profit, sales by region, sub-category and category, with year and region
+slicers. Full-resolution PDF:
+[`docs/powerbi-report-superstore.pdf`](docs/powerbi-report-superstore.pdf).*
 
 Power BI Desktop is Windows-only and was not run in this Linux environment, so no
 `.pbix` is committed and no Desktop validation is claimed. Build, refresh, and
@@ -103,6 +112,7 @@ data/processed/   # Cleaned CSVs and the SQLite database (ignored by Git)
 notebooks/        # Jupyter notebooks (data understanding, data cleaning)
 sql/              # Schema, validation, and analysis queries (01–10)
 scripts/          # Reproducible database loader
+docs/             # Report exports: Power BI screenshot and PDF
 reports/          # Markdown reports (executive summary, portfolio insights)
 powerbi/          # Model specification and DAX measure library
 ```

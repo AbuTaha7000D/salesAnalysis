@@ -17,6 +17,9 @@
 //       Returns[Order ID]      -> Orders[Order ID]
 //   - The Returns -> Orders relationship is SINGLE-direction. Return measures
 //     are therefore defined over Orders and inherit the model's filter context.
+//   - These measures assume the table names and relationships documented in the
+//     reference specification (model_specification.md sections 3-4). If the deployed
+//     model differs, every measure must be re-validated against it.
 //
 // Core KPI definitions match sql/03-sql/10 so results reconcile:
 //   sales = SUM(Sales), profit = SUM(Profit),
