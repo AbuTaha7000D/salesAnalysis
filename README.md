@@ -19,6 +19,11 @@ Git. It contains three sheets: `Orders`, `People`, and `Returns`.
 - Identify drivers of low/negative profit and assess return patterns.
 - Produce summary tables, visualizations, and a written report of findings.
 
+## Reports
+
+- [`reports/portfolio_insights.md`](reports/portfolio_insights.md) — evidence-based portfolio insights
+- [`reports/executive_summary.md`](reports/executive_summary.md) — full executive summary
+
 ## Planned tools
 
 - **Python / Pandas** — data loading, cleaning, and exploratory analysis
