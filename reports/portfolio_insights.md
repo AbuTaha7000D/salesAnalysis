@@ -3,7 +3,10 @@
 Evidence-based business insights from the Tableau Superstore sample dataset, written
 for a Data Analyst portfolio. Every figure below was independently re-computed from
 `data/processed/superstore.db` (read-only SQL) for this report and cross-checked
-against the project's SQL, notebooks, and `reports/executive_summary.md`.
+against the project's SQL, notebooks, and `reports/executive_summary.md`. The charts
+are rendered by `scripts/generate_figures.py`, which executes the same `sql/03`,
+`sql/04`, `sql/05`, and `sql/07` statements against that database, so every chart
+matches the table beside it.
 
 **Scope.** Whole dataset, order-line grain, no de-duplication, no date filter; Canadian
 and future-dated records are retained (see *Dataset caveats*). All statements are
@@ -62,6 +65,12 @@ above 20% has a negative aggregate margin, and every band above 40% is 100% loss
 - 51.7% of all 10,194 lines (5,269) carry a discount. Discounts range 0.0–0.8 across 12 values.
 - Lines discounted **> 20%**: 1,415 lines, **1,370 loss-making (96.8%)**, aggregate margin **−37.29%**.
 
+![Profit margin by discount band](figures/03_discount_band_margin.png)
+
+*Aggregate profit margin by discount band (`sql/05`). `n` is the number of order lines in each
+band; the two sparsest bands (`n=96`, `n=77`) have volatile margins. The relationship is a
+descriptive association, not evidence that discounts cause the losses.*
+
 **Business interpretation.** Discount policy is the strongest profit lever visible in the
 data; deep discounting is where portfolio profit is destroyed and is worth a pricing-governance
 review.
@@ -91,6 +100,11 @@ the largest sub-category losses.
 Worst sub-categories: **Tables −17,753.21 (−8.53%)**, **Bookcases −3,632.07 (−3.15%)**,
 **Supplies −1,171.39 (−2.51%)**.
 
+![Profit margin by category](figures/02_profit_margin_by_category.png)
+
+*Profit margin by category (`sql/04`), with profit dollars on each bar; the dashed rule is the
+12.56% overall margin. Furniture earns a comparable share of sales but a fraction of the profit.*
+
 **Business interpretation.** Furniture generates revenue on par with the other categories but a
 fraction of the profit; the drag is concentrated in high-ticket furniture rather than spread
 evenly.
@@ -115,6 +129,11 @@ counts are non-additive, so only line-level sums should be added.
 | South | 822 | 24 | 2.92% |
 
 Returned-order sales 180,504.28 (7.76% of sales); profit on those lines 23,232.36.
+
+![Return rate by region](figures/04_return_rate_by_region.png)
+
+*Return rate by region (`sql/07`), with returned/total orders on each bar. These are orders
+flagged as returned, not confirmed refunds — the dataset carries no refund amount.*
 
 **Business interpretation.** A specific, sizeable, localized signal worth operational
 investigation (product mix, fulfilment, or customer expectations in the West).
@@ -165,6 +184,12 @@ Annual figures reconcile to the totals (orders 995+1,053+1,340+1,723 = 5,111;
 units = 38,654; sales = 2,326,534.35). However, **1,106 of 2026's 3,379 lines (32.7%) are dated
 after 2026-10-13** (2026-10: 164; 2026-11: 460; 2026-12: 482), and the highest-sales month
 2026-11 is 100% future-dated.
+
+![Monthly sales and profit with the 2026-10-13 analysis cutoff](figures/01_monthly_sales_profit.png)
+
+*Monthly sales and profit, 2023-01 to 2026-12 (`sql/03`). The three shaded months (2026-10 to
+2026-12) are drawn dashed because they contain records dated after the 2026-10-13 analysis date;
+2026 is therefore provisional and is not presented as a completed year.*
 
 **Business interpretation.** Order/unit growth is a defensible within-record trend, but 2026
 revenue/profit and any year-over-year comparison involving 2026 are provisional and must be

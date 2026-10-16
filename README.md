@@ -1,9 +1,9 @@
 # Superstore Sales & Profitability Analysis
 
 End-to-end data analysis of the Tableau Superstore sample dataset: profiling and cleaning
-with Python/Pandas, structured analysis in SQL over SQLite, and a Power BI semantic model
-with DAX measures. The project shows where profit is earned and lost across regions,
-categories, discounts, and returns.
+with Python/Pandas, structured analysis in SQL over SQLite, reproducible Matplotlib charts,
+and a Power BI semantic model with DAX measures. The project shows where profit is earned and
+lost across regions, categories, discounts, and returns.
 
 ## Key Results
 
@@ -22,6 +22,13 @@ categories, discounts, and returns.
   (17.45%) and Office Supplies (17.22%).
 - **Returns are concentrated in the West:** **11.56%** against about **2.9–3.3%** in the
   other regions.
+
+![Monthly sales and profit with the 2026-10-13 analysis cutoff](reports/figures/01_monthly_sales_profit.png)
+
+*Monthly sales and profit (`sql/03`). The months shaded after the dotted line contain records
+dated after the fixed analysis date **2026-10-13**, so **2026 is provisional**, not a completed
+year. The remaining charts (discount bands, category margin, return rate by region) are embedded
+in [`reports/portfolio_insights.md`](reports/portfolio_insights.md).*
 
 Detailed findings: [`reports/portfolio_insights.md`](reports/portfolio_insights.md) ·
 [`reports/executive_summary.md`](reports/executive_summary.md)
@@ -71,16 +78,19 @@ raw dataset → Python/Pandas notebooks → cleaned CSVs → SQLite → SQL anal
 | Profiling and cleaning | Python / Pandas (Jupyter) | `notebooks/01…`, `notebooks/02…` → `data/processed/*.csv` |
 | Storage and validation | SQLite, Python loader | `data/processed/superstore.db` |
 | Analysis | SQL (`sql/01`–`sql/10`) | Verified trend, product, discount, regional, returns, customer, shipping, and geographic results |
-| Reporting | Markdown | `reports/` |
+| Reporting | Markdown, Python/Matplotlib charts | `reports/` (charts in `reports/figures/`) |
 | BI modelling | Power BI (semantic model + DAX) | `powerbi/` |
 
-Requires Python 3 with pandas, numpy, xlrd, and JupyterLab (ipykernel for execution); the virtual environment
-(`.venv/`) is Git-ignored.
+Requires Python 3 with pandas, numpy, xlrd, and JupyterLab (ipykernel for execution); the virtual
+environment (`.venv/`) is Git-ignored. Regenerating the report charts additionally needs
+**Matplotlib**, which is **not yet pinned in [`requirements.txt`](requirements.txt)** — install it
+with `pip install matplotlib` or add a pinned `matplotlib==<version>` line to `requirements.txt`.
 
 ## Reports
 
 - [`reports/portfolio_insights.md`](reports/portfolio_insights.md) — evidence-based portfolio insights
 - [`reports/executive_summary.md`](reports/executive_summary.md) — full executive summary
+- [`reports/figures/`](reports/figures) — chart PNGs embedded in the reports (regenerate with `scripts/generate_figures.py`)
 
 ## Power BI
 
@@ -111,9 +121,9 @@ data/raw/         # Original source data (ignored by Git)
 data/processed/   # Cleaned CSVs and the SQLite database (ignored by Git)
 notebooks/        # Jupyter notebooks (data understanding, data cleaning)
 sql/              # Schema, validation, and analysis queries (01–10)
-scripts/          # Reproducible database loader
+scripts/          # Reproducible database loader and chart generator
 docs/             # Report exports: Power BI screenshot and PDF
-reports/          # Markdown reports (executive summary, portfolio insights)
+reports/          # Markdown reports and generated chart PNGs (reports/figures/)
 powerbi/          # Model specification and DAX measure library
 ```
 
@@ -157,6 +167,13 @@ Run from the repository root. `data/` is Git-ignored, so place the raw workbook 
    sqlite3 -header -column data/processed/superstore.db < sql/02_validate_database.sql
    ```
 
+5. (Optional) Regenerate the report charts. This reads the database read-only and rewrites the
+   PNGs under `reports/figures/`. It requires Matplotlib (see the note above):
+
+   ```bash
+   .venv/bin/python scripts/generate_figures.py
+   ```
+
 ### Analysis entry points
 
 | Entry point | Command |
@@ -164,6 +181,7 @@ Run from the repository root. `data/` is Git-ignored, so place the raw workbook 
 | Data understanding (exploratory) | `.venv/bin/jupyter nbconvert --to notebook --execute --output-dir=/tmp notebooks/01_data_understanding.ipynb` |
 | Data cleaning | Same command as **step 2** above |
 | SQL analyses (`sql/03`–`sql/10`) | `sqlite3 -header -column data/processed/superstore.db < sql/03_sales_trends.sql` (same pattern for `sql/04`–`sql/10`) |
+| Report charts | `.venv/bin/python scripts/generate_figures.py` |
 | Power BI model | See [`powerbi/README.md`](powerbi/README.md) |
 
 Side effects: the data-understanding command writes its executed copy to `/tmp`, leaving
