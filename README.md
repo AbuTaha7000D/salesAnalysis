@@ -74,7 +74,7 @@ raw dataset → Python/Pandas notebooks → cleaned CSVs → SQLite → SQL anal
 | Reporting | Markdown | `reports/` |
 | BI modelling | Power BI (semantic model + DAX) | `powerbi/` |
 
-Requires Python 3 with pandas, xlrd, matplotlib, and Jupyter; the virtual environment
+Requires Python 3 with pandas, numpy, xlrd, and JupyterLab (ipykernel for execution); the virtual environment
 (`.venv/`) is Git-ignored.
 
 ## Reports
