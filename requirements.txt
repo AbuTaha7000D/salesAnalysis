@@ -1,5 +1,6 @@
 pandas==3.0.6
 numpy==2.5.4
 xlrd==2.0.2
+matplotlib==3.11.2
 jupyterlab==4.6.4
 ipykernel==7.4.0

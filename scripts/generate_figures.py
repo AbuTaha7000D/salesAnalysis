@@ -45,8 +45,8 @@ except ImportError as error:  # pragma: no cover - environment setup only
     print(
         "ERROR: Matplotlib is required to render the report charts but could not be "
         f"imported ({error}).\n"
-        "Install it with `pip install matplotlib`, or follow the 'Reproducible setup' "
-        "section of README.md.",
+        "Install the pinned dependencies with `pip install -r requirements.txt`, or follow "
+        "the 'Reproducible setup' section of README.md.",
         file=sys.stderr,
     )
     sys.exit(1)

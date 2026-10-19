@@ -85,10 +85,10 @@ raw dataset → Python/Pandas notebooks → cleaned CSVs → SQLite → SQL anal
 | Analysis | SQL (`sql/01`–`sql/10`) | Verified trend, product, discount, regional, returns, customer, shipping, and geographic results |
 | Reporting | Markdown, Python/Matplotlib charts | `reports/` (charts in `reports/figures/`) |
 
-Requires Python 3 with pandas, numpy, xlrd, and JupyterLab (ipykernel for execution); the virtual
-environment (`.venv/`) is Git-ignored. Regenerating the report charts additionally needs
-**Matplotlib**, which is **not yet pinned in [`requirements.txt`](requirements.txt)** — install it
-with `pip install matplotlib` or add a pinned `matplotlib==<version>` line to `requirements.txt`.
+Requires Python 3 with pandas, numpy, xlrd, Matplotlib, and JupyterLab (ipykernel for execution);
+the virtual environment (`.venv/`) is Git-ignored. All dependencies are pinned in
+[`requirements.txt`](requirements.txt), including the chart library **Matplotlib**
+(`matplotlib==3.11.2`).
 
 ## Reports
 
@@ -148,7 +148,7 @@ Run from the repository root. `data/` is Git-ignored, so place the raw workbook 
    ```
 
 5. (Optional) Regenerate the report charts. This reads the database read-only and rewrites the
-   PNGs under `reports/figures/`. It requires Matplotlib (see the note above):
+   PNGs under `reports/figures/` using the pinned Matplotlib dependency:
 
    ```bash
    .venv/bin/python scripts/generate_figures.py
