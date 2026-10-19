@@ -218,13 +218,14 @@ deliberately (not treated as invalid) but are also not completed performance.
 
 ## Recommended next step
 
-Build a **profit-driver waterfall** for the executive view, decomposed in **profit dollars**
-(not margin percentages). The three components reconcile exactly to total profit:
+In an executive view, Insight 1 is best shown in **profit dollars** rather than margin
+percentages. A **profit-driver waterfall** could be built from three components that
+reconcile exactly to total profit:
 
 - Undiscounted lines (discount = 0): **+326,718.59** (4,925 lines)
 - Shallow discounts (0 < discount ≤ 20%): **+101,598.91** (3,854 lines)
 - Deep discounts (discount > 20%): **−136,020.69** (1,415 lines; 1,370 loss-making)
 - **Total: 292,296.81** (= 326,718.59 + 101,598.91 − 136,020.69)
 
-This translates Insight 1 into a single visual while preserving the association-only caveat.
-Not created here; pending approval.
+Built as a waterfall, these components would translate Insight 1 into a single visual while
+preserving the association-only caveat.
