@@ -72,6 +72,34 @@ EXPECTED_CATEGORY_MARGIN = {"Technology": 0.1745, "Office Supplies": 0.1722, "Fu
 EXPECTED_BAND_MARGIN = [0.2956, 0.1656, 0.1154, -0.1006, -0.1945, -0.3571, -0.8675, -0.9876, -1.8001]
 EXPECTED_REGION_RATE = {"West": 0.1156, "Central": 0.0331, "East": 0.0298, "South": 0.0292}
 
+# Discount bands are defined in sql/05_discount_analysis.sql as nine fixed
+# categories: no discount, then eight 10-percentage-point half-open intervals.
+# The labels below are the documented band definitions, used to validate both
+# the SQL output and the labels rendered on the chart.
+DISCOUNT_BAND_WIDTH = 0.10
+EXPECTED_BAND_SQL_LABELS = [
+    "0.00 (no discount)",
+    "(0.00, 0.10]",
+    "(0.10, 0.20]",
+    "(0.20, 0.30]",
+    "(0.30, 0.40]",
+    "(0.40, 0.50]",
+    "(0.50, 0.60]",
+    "(0.60, 0.70]",
+    "(0.70, 0.80]",
+]
+EXPECTED_BAND_LABELS = [
+    "0% (none)",
+    "(0%, 10%]",
+    "(10%, 20%]",
+    "(20%, 30%]",
+    "(30%, 40%]",
+    "(40%, 50%]",
+    "(50%, 60%]",
+    "(60%, 70%]",
+    "(70%, 80%]",
+]
+
 # Shared palette: keeps the four charts visually consistent.
 COLOR_POSITIVE = "#2f7d4f"
 COLOR_NEGATIVE = "#c0392b"
@@ -212,10 +240,16 @@ def dollars(value: float) -> str:
     return f"${value:,.0f}"
 
 
-def discount_band_label(band_order: int, lower: float, upper: float) -> str:
-    """Compact axis label for a half-open discount band (lower exclusive)."""
+def discount_band_label(band_order: int) -> str:
+    """Compact axis label for a half-open discount band (lower bound exclusive).
+
+    Boundaries come from the fixed band definition (10-point intervals starting
+    at zero), never from the observed minimum/maximum discount in each band.
+    """
     if band_order == 0:
         return "0% (none)"
+    lower = (band_order - 1) * DISCOUNT_BAND_WIDTH
+    upper = band_order * DISCOUNT_BAND_WIDTH
     return f"({lower:.0%}, {upper:.0%}]"
 
 
@@ -452,8 +486,7 @@ def chart_discount_bands(bands: pd.DataFrame) -> Path:
     axis.axhline(0, color="#111827", lw=1.0, zorder=4)
     axis.set_xticks(positions)
     axis.set_xticklabels(
-        [discount_band_label(int(row.band_order), row.band_discount_min, row.band_discount_max)
-         for row in data.itertuples()],
+        [discount_band_label(int(row.band_order)) for row in data.itertuples()],
         fontsize=9.5,
     )
     axis.set_ylim(-215, 55)
@@ -509,7 +542,7 @@ def chart_region_returns(regions: pd.DataFrame) -> Path:
         axis.text(
             position,
             row["return_rate"] * 100 + 0.3,
-            f"{row['return_rate']:.2%}\n{int(row['returned_orders'])} of {int(row['orders'])} orders",
+            f"{row['return_rate']:.2%}\n{int(row['returned_orders']):,} of {int(row['orders']):,} orders",
             ha="center",
             va="bottom",
             fontsize=9.6,
@@ -601,6 +634,14 @@ def validate(
             f"category margins drifted: {observed_categories}")
 
     require(len(bands) == 9, f"expected 9 discount bands, found {len(bands)}")
+    require(list(bands["band_order"]) == list(range(9)),
+            f"unexpected discount band order: {list(bands['band_order'])}")
+    observed_band_labels = list(bands["discount_band"])
+    require(observed_band_labels == EXPECTED_BAND_SQL_LABELS,
+            f"discount band definitions drifted: {observed_band_labels}")
+    rendered_band_labels = [discount_band_label(int(order)) for order in bands["band_order"]]
+    require(rendered_band_labels == EXPECTED_BAND_LABELS,
+            f"rendered discount band labels do not match the documented bands: {rendered_band_labels}")
     require(int(bands["order_lines"].sum()) == EXPECTED_TOTAL_LINES, "discount bands do not cover every line")
     observed_bands = bands["profit_margin"].tolist()
     require(observed_bands == EXPECTED_BAND_MARGIN, f"discount band margins drifted: {observed_bands}")
